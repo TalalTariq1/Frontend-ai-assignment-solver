@@ -1,35 +1,31 @@
-# Frontend-ai-assignment-solver
+# AI Assignment Solver (Frontend)
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+A sleek, modern React application that allows students to upload assignment documents and receive AI-generated solutions in specific programming languages.
 
-## Built with v0
+**Live Demo:** [https://assignment-solver-seven.vercel.app/](https://assignment-solver-seven.vercel.app/)
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+## 🚀 Overview
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_GXJVQ7kZoNDXZ3e0BTpTyCQS2Zm9)
+This frontend serves as the user interface for the AI Assignment Solver ecosystem. It handles student data collection, file uploads, and provides an interactive interface for viewing and downloading AI-generated results.
 
-## Getting Started
+### Key Features
+- **Student Profiling:** Input fields for Name, Roll Number, Section, and Subject.
+- **Language Selection:** Choose the target programming language for the solution.
+- **Secure File Upload:** Drag-and-drop support for `.docx` assignment files.
+- **Async Processing:** Real-time loading states while the backend processes the AI logic.
+- **Smart Download:** Dynamic file generation with a secure Blob-based download system.
 
-First, run the development server:
+## 🛠️ Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+- **Framework:** React.js (Vite)
+- **Styling:** Tailwind CSS (Modern Dark Mode UI)
+- **API Interaction:** Fetch API with Multipart/Form-Data
+- **Deployment:** Vercel
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔌 API Integration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The frontend communicates with a FastAPI backend hosted on Railway. It sends student metadata and document files to the `/upload` endpoint and retrieves processed documents from the `/download` endpoint.
 
-## Learn More
-
-To learn more, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
-
-<a href="https://v0.app/chat/api/kiro/clone/TalalTariq1/Frontend-ai-assignment-solver" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+```javascript
+// Example Endpoint Configuration
+const API_BASE_URL = "[https://web-production-187bb.up.railway.app](https://web-production-187bb.up.railway.app)";
