@@ -6,11 +6,12 @@ export default function AIAssignmentSolver() {
   const [studentName, setStudentName] = useState("");
   const [rollNumber, setRollNumber] = useState("");
   const [section, setSection] = useState("");
+  const [subject, setSubject] = useState("");
   const [language, setLanguage] = useState("");
   const [file, setFile] = useState(null);
+  const [downloadUrl, setDownloadUrl] = useState("");
   const [fileName, setFileName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState("");
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
@@ -50,15 +51,18 @@ export default function AIAssignmentSolver() {
 
     setIsLoading(true);
     setError("");
-    setResult("");
+    setDownloadUrl("");
 
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("name", studentName);
-      formData.append("rollNumber", rollNumber);
+      formData.append("roll_number", rollNumber);
       formData.append("section", section);
+      formData.append("subject", subject);
       formData.append("language", language);
+
+      console.log("[v0] Sending FormData to backend...");
 
       const response = await fetch(
         "https://web-production-187bb.up.railway.app/upload",
@@ -68,29 +72,28 @@ export default function AIAssignmentSolver() {
         }
       );
 
+      console.log("[v0] Response status:", response.status);
+
       if (!response.ok) {
-        throw new Error(`Server responded with status ${response.status}`);
+        const errorText = await response.text();
+        console.log("[v0] Error response:", errorText);
+        throw new Error(`Server responded with status ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
-      setResult(data.answer || data.result || JSON.stringify(data, null, 2));
+      console.log("[v0] Response data:", data);
+
+      if (data.status === "Success" && data.download_url) {
+        setDownloadUrl(`https://web-production-187bb.up.railway.app${data.download_url}`);
+      } else {
+        throw new Error(data.message || "Unexpected response from server");
+      }
     } catch (err) {
+      console.log("[v0] Fetch error:", err);
       setError(err.message || "Failed to process the assignment. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const downloadAsText = () => {
-    const blob = new Blob([result], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${studentName || "assignment"}_solution.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   const clearFile = () => {
@@ -183,6 +186,18 @@ export default function AIAssignmentSolver() {
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
                   placeholder="Enter section"
+                  className="w-full px-4 py-2.5 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="e.g., Mathematics, Physics"
                   className="w-full px-4 py-2.5 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                 />
               </div>
@@ -384,12 +399,12 @@ export default function AIAssignmentSolver() {
         </div>
 
         {/* Result Section */}
-        {result && (
+        {downloadUrl && (
           <div className="mt-6 bg-card border border-border rounded-2xl p-6 shadow-xl shadow-black/20 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <div className="flex flex-col items-center text-center gap-4">
+              <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-green-400"
+                  className="w-8 h-8 text-green-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -401,14 +416,22 @@ export default function AIAssignmentSolver() {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                AI Solution
-              </h2>
-              <button
-                onClick={downloadAsText}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-secondary/80 text-foreground text-sm font-medium rounded-lg transition-colors"
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground mb-1">
+                  Assignment Solved Successfully
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Your solution is ready for download
+                </p>
+              </div>
+              <a
+                href={downloadUrl}
+                download
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-400 text-white font-semibold rounded-xl hover:from-green-600 hover:to-emerald-500 transition-all"
               >
                 <svg
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -421,12 +444,7 @@ export default function AIAssignmentSolver() {
                   />
                 </svg>
                 Download Result
-              </button>
-            </div>
-            <div className="bg-secondary rounded-xl p-4 max-h-96 overflow-y-auto">
-              <pre className="text-sm text-foreground whitespace-pre-wrap font-mono leading-relaxed">
-                {result}
-              </pre>
+              </a>
             </div>
           </div>
         )}
