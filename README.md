@@ -65,6 +65,5 @@ The Backend repository is kept private to protect API credentials and the propri
 📝 License
 Distributed under the MIT License.
 
-Author: [Your Name]
+Author: [Talal Tariq]
 
-Project Link: https://github.com/your-username/assignment-solver-frontend
